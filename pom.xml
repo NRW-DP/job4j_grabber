@@ -53,6 +53,11 @@
             <artifactId>quartz</artifactId>
             <version>2.3.2</version>
         </dependency>
+        <dependency>
+            <groupId>org.liquibase</groupId>
+            <artifactId>liquibase-core</artifactId>
+            <version>4.23.1</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -110,6 +115,14 @@
                 <version>3.2.0</version>
                 <configuration>
                     <javadocExecutable>${java.home}/bin/javadoc</javadocExecutable>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.liquibase</groupId>
+                <artifactId>liquibase-maven-plugin</artifactId>
+                <version>4.23.1</version>
+                <configuration>
+                    <propertyFile>src/main/resources/db/rabbit.properties</propertyFile>
                 </configuration>
             </plugin>
         </plugins>
