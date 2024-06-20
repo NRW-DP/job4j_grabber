@@ -51,12 +51,13 @@ public class AlertRabbit {
     }
 
     public static void main(String[] args) {
-        try {
+        try (Connection connection = getConnection()) {
             List<Long> store = new ArrayList<>();
             Scheduler scheduler = StdSchedulerFactory.getDefaultScheduler();
             scheduler.start();
             JobDataMap data = new JobDataMap();
             data.put("store", store);
+            data.put("connection", connection);
             JobDetail job = newJob(Rabbit.class)
                     .usingJobData(data)
                     .build();
@@ -88,7 +89,8 @@ public class AlertRabbit {
             List<Long> store = (List<Long>) context.getJobDetail().getJobDataMap().get("store");
             long timeStamp = System.currentTimeMillis();
             store.add(timeStamp);
-            try (Connection connection = getConnection()) {
+            Connection connection = (Connection) context.getJobDetail().getJobDataMap().get("connection");
+            try {
                 writeTimestampToDB(connection, timeStamp);
             } catch (Exception e) {
                 e.printStackTrace();
