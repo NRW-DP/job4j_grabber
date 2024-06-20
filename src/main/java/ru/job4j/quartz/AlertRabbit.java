@@ -57,7 +57,6 @@ public class AlertRabbit {
             scheduler.start();
             JobDataMap data = new JobDataMap();
             data.put("store", store);
-            data.put("connection", getConnection());
             JobDetail job = newJob(Rabbit.class)
                     .usingJobData(data)
                     .build();
@@ -89,8 +88,7 @@ public class AlertRabbit {
             List<Long> store = (List<Long>) context.getJobDetail().getJobDataMap().get("store");
             long timeStamp = System.currentTimeMillis();
             store.add(timeStamp);
-            try {
-                Connection connection = (Connection) context.getJobDetail().getJobDataMap().get("connection");
+            try (Connection connection = getConnection()) {
                 writeTimestampToDB(connection, timeStamp);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -98,8 +96,7 @@ public class AlertRabbit {
         }
 
         public void writeTimestampToDB(Connection connection, long timeStamp) {
-            try (PreparedStatement statement =
-                         connection.prepareStatement(INSERT_TABLE)) {
+            try (PreparedStatement statement = connection.prepareStatement(INSERT_TABLE)) {
                 statement.setTimestamp(1, new Timestamp(timeStamp));
                 statement.execute();
             } catch (Exception e) {
