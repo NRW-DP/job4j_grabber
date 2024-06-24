@@ -24,8 +24,9 @@ public class HabrCareerParse {
             Element linkElement = titleElement.child(0);
             String vacancyName = titleElement.text();
             String link = String.format("%s%s", SOURCE_LINK, linkElement.attr("href"));
-            Element dateElement = row.select(".basic-date").first();
-            String date = dateElement != null ? dateElement.text() : "Date not found";
+            Element dateElement = row.select(".vacancy-card__date").first();
+            Element timeElement = dateElement.child(0);
+            String date = timeElement.attr("datetime");
             System.out.printf("%s %s %s%n", vacancyName, link, date);
         });
     }
