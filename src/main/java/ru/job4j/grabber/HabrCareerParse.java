@@ -16,6 +16,7 @@ public class HabrCareerParse {
     public static final int END_PAGE_NUMBER = 5;
 
     public static void main(String[] args) throws IOException {
+        HabrCareerParse parser = new HabrCareerParse();
         for (int i = START_PAGE_NUMBER; i <= END_PAGE_NUMBER; i++) {
             String fullLink = "%s%s%d%s".formatted(SOURCE_LINK, PREFIX, i, SUFFIX);
             Connection connection = Jsoup.connect(fullLink);
@@ -29,8 +30,24 @@ public class HabrCareerParse {
                 Element dateElement = row.select(".vacancy-card__date").first();
                 Element timeElement = dateElement.child(0);
                 String date = timeElement.attr("datetime");
-                System.out.printf("%s %s %s%n", vacancyName, link, date);
+                String description = parser.retrieveDescription(link);
+                System.out.printf("%s %s %s%nDescription: %s%n", vacancyName, link, date, description);
             });
         }
+    }
+
+    private String retrieveDescription(String link) {
+        String vacancyDescription = "";
+        Connection connection = Jsoup.connect(link);
+       try {
+           Document document = connection.get();
+           Elements rows = document.select(".faded-content__container");
+           if (!rows.isEmpty()) {
+               vacancyDescription = rows.first().text();
+           }
+       } catch (IOException e) {
+           e.printStackTrace();
+       }
+        return vacancyDescription;
     }
 }
